@@ -1,7 +1,6 @@
 package main
 
-import "fmt"
+import _ "AnimeCat/mongodb"
 
 func main() {
-	fmt.Println("vim-go")
 }
