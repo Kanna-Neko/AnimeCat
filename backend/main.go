@@ -1,6 +1,7 @@
 package main
 
-import _ "AnimeCat/mongodb"
+import "AnimeCat/router"
 
 func main() {
+	router.InitRouter()
 }
