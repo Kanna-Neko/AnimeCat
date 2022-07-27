@@ -15,5 +15,6 @@ type Setting struct {
 	Theme        string `json:"theme" bson:"theme"`
 	Wallpaper    string `json:"wallpaper" bson:"wallpaper"`
 	WebsiteTitle string `json:"websiteTitle" bson:"websiteTitle"`
+	Password     string `json:"password" bson:"password"`
 	Aim          string `json:"aim" bson:"aim"`
 }
