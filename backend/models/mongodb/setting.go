@@ -28,6 +28,7 @@ var (
 		Wallpaper:    "",
 		WebsiteTitle: "AnimeCat",
 		Aim:          "system",
+		Password:     "AnimeCat",
 	}
 )
 
@@ -40,7 +41,6 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println("setting config inited")
 }
 
 func InitMongodbClient() error {
@@ -71,6 +71,7 @@ func GetSetting() (Setting, error) {
 	}
 	collection := client.Database("AnimeCat").Collection("setting")
 	err := collection.FindOne(context.TODO(), filter).Decode(&res)
+	res.Password = ""
 	return res, err
 }
 
@@ -80,6 +81,9 @@ func InitSetting() error {
 	if err == mongo.ErrNoDocuments {
 		_, err := client.Database("AnimeCat").Collection("setting").InsertOne(context.TODO(), defaultSetting)
 		return err
+	} else if err == nil {
+		log.Println("setting config inited")
+		return nil
 	} else {
 		return err
 	}
