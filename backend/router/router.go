@@ -2,6 +2,7 @@ package router
 
 import (
 	"AnimeCat/controllers"
+	"AnimeCat/middlewares"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -10,7 +11,7 @@ import (
 func InitRouter() {
 	r := gin.Default()
 	r.POST("/api/account", controllers.LoginHandler)
-	api := r.Group("/api")
+	api := r.Group("/api", middlewares.JWTAuthMiddleware())
 	{
 		api.GET("/setting", controllers.GetSettingHandler)
 	}
