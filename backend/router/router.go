@@ -11,6 +11,7 @@ import (
 func InitRouter() {
 	r := gin.Default()
 	r.POST("/api/account", controllers.LoginHandler)
+	r.GET("/api/wallpaper", controllers.GetWallPaperHandler)
 	api := r.Group("/api", middlewares.JWTAuthMiddleware())
 	{
 		api.GET("/setting", controllers.GetSettingHandler)

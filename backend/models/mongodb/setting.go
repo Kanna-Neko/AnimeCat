@@ -75,6 +75,16 @@ func GetSetting() (Setting, error) {
 	return res, err
 }
 
+func GetWallPaper() (string, error) {
+	var res Setting
+	var filter = bson.M{
+		"aim": "system",
+	}
+	collection := client.Database("AnimeCat").Collection("setting")
+	err := collection.FindOne(context.TODO(), filter).Decode(&res)
+	return res.Wallpaper, err
+}
+
 func InitSetting() error {
 	var filter = bson.M{"aim": "system"}
 	err := client.Database("AnimeCat").Collection("setting").FindOne(context.TODO(), filter).Err()
