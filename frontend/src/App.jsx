@@ -1,16 +1,15 @@
-import { useRoutes } from 'react-router-dom'
-import routes from './routes'
+import routes from './router'
 import './App.less'
+import { useRoutes } from 'react-router-dom'
+import 'animate.css'
 
-function App() {
-
+export default function App() {
   const element = useRoutes(routes)
 
   return (
     <div id="app">
-      {/* <Home/> */}
+      {element}
     </div>
   )
 }
 
-export default App
