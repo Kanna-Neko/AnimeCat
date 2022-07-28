@@ -71,7 +71,6 @@ func GetSetting() (Setting, error) {
 	}
 	collection := client.Database("AnimeCat").Collection("setting")
 	err := collection.FindOne(context.TODO(), filter).Decode(&res)
-	res.Password = ""
 	return res, err
 }
 
@@ -97,4 +96,11 @@ func InitSetting() error {
 	} else {
 		return err
 	}
+}
+
+func ModifySetting(setting Setting) error {
+	var filter = bson.M{"aim": "system"}
+	var set = bson.M{"$set": setting}
+	_, err := client.Database("AnimeCat").Collection("setting").UpdateOne(context.TODO(), filter, set)
+	return err
 }

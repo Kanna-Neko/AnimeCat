@@ -10,8 +10,8 @@ type Setting struct {
 	Language     string `json:"language" bson:"language"`
 	Logo         string `json:"logo" bson:"logo"`
 	PageSize     int64  `json:"pageSize" bson:"pageSize"`
-	SecretId     string `json:"SecretId" bson:"secretId"`
-	SecretKey    string `json:"SecretKey" bson:"secretKey"`
+	SecretId     string `json:"secretId" bson:"secretId"`
+	SecretKey    string `json:"secretKey" bson:"secretKey"`
 	Theme        string `json:"theme" bson:"theme"`
 	Wallpaper    string `json:"wallpaper" bson:"wallpaper"`
 	WebsiteTitle string `json:"websiteTitle" bson:"websiteTitle"`

@@ -15,6 +15,7 @@ func InitRouter() {
 	api := r.Group("/api", middlewares.JWTAuthMiddleware())
 	{
 		api.GET("/setting", controllers.GetSettingHandler)
+		api.PUT("/setting", controllers.PutSettingHandler)
 	}
 	err := r.Run(":80")
 	if err != nil {
