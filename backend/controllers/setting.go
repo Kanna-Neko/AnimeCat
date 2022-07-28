@@ -61,7 +61,7 @@ func PutSettingHandler(c *gin.Context) {
 	}
 	if pageSize == 0 {
 		c.JSON(http.StatusForbidden, gin.H{
-			"status":  http.StatusBadRequest,
+			"status":  http.StatusForbidden,
 			"message": fmt.Sprintf("pageSize must greater then zero, you input %d", pageSize),
 		})
 		return
