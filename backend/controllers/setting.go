@@ -29,7 +29,7 @@ func GetSettingHandler(c *gin.Context) {
 }
 
 func GetWallPaperHandler(c *gin.Context) {
-	setting, err := mongodb.GetWallPaper()
+	wallpaper, err := mongodb.GetWallPaper()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  http.StatusInternalServerError,
@@ -38,7 +38,19 @@ func GetWallPaperHandler(c *gin.Context) {
 		log.Printf("server error: %s", err.Error())
 		return
 	}
-	c.Redirect(http.StatusFound, setting)
+	c.Redirect(http.StatusFound, wallpaper)
+}
+func GetLogoHandler(c *gin.Context) {
+	logoPath, err := mongodb.GetLogo()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": fmt.Sprintf("server error: %s", err.Error()),
+		})
+		log.Printf("server error: %s", err.Error())
+		return
+	}
+	c.Redirect(http.StatusFound, logoPath)
 }
 
 func PutSettingHandler(c *gin.Context) {
