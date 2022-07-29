@@ -1,5 +1,7 @@
 package mongodb
 
+import "go.mongodb.org/mongo-driver/bson/primitive"
+
 type Setting struct {
 	BucketName   string `json:"bucketName" bson:"bucketName"`
 	BucketRegion string `json:"bucketRegion" bson:"bucketRegion"`
@@ -17,4 +19,19 @@ type Setting struct {
 	WebsiteTitle string `json:"websiteTitle" bson:"websiteTitle"`
 	Password     string `json:"password" bson:"password"`
 	Aim          string `json:"aim" bson:"aim"`
+}
+
+type AnimeCat struct {
+	ID         primitive.ObjectID `json:"_id" bson:"_id"`
+	Name       string             `json:"name" bson:"name"`
+	UpdateTime int64              `json:"updateTime" bson:"updateTime"`
+	Size       int64              `json:"size" bson:"size"`
+	IsDir      bool               `json:"isDir" bson:"isDir"`
+	DirChild   []Cat              `json:"dirChild" bson:"dirChild"`
+	ObjChild   []Cat              `json:"objChild" bson:"objChild"`
+}
+
+type Cat struct {
+	ID   primitive.ObjectID `json:"-" bson:"_id"`
+	Name string             `json:"name" bson:"name"`
 }

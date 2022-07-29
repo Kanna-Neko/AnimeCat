@@ -17,7 +17,7 @@ func InitRouter() {
 	{
 		api.GET("/setting", controllers.GetSettingHandler)
 		api.PUT("/setting", controllers.PutSettingHandler)
-		api.GET("/api/AnimeCat/*", controllers.AnimeCatHandler)
+		api.GET("/AnimeCat/*path", controllers.AnimeCatHandler)
 	}
 	err := r.Run(":80")
 	if err != nil {

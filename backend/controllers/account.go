@@ -17,7 +17,7 @@ func LoginHandler(c *gin.Context) {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  http.StatusInternalServerError,
-			"message": fmt.Sprintf("server error: %s", err),
+			"message": fmt.Sprintf("server error: %s", err.Error()),
 		})
 		return
 	}
@@ -27,7 +27,7 @@ func LoginHandler(c *gin.Context) {
 			log.Println(err)
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"status":  http.StatusInternalServerError,
-				"message": fmt.Sprintf("server error: %s", err),
+				"message": fmt.Sprintf("server error: %s", err.Error()),
 			})
 		} else {
 			c.JSON(200, gin.H{

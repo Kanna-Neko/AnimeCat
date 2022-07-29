@@ -41,6 +41,10 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	err = InitAnimeCat()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func InitMongodbClient() error {
@@ -99,9 +103,11 @@ func InitSetting() error {
 	err := client.Database("AnimeCat").Collection("setting").FindOne(context.TODO(), filter).Err()
 	if err == mongo.ErrNoDocuments {
 		_, err := client.Database("AnimeCat").Collection("setting").InsertOne(context.TODO(), defaultSetting)
+		if err != nil {
+			log.Println("setting config inited")
+		}
 		return err
 	} else if err == nil {
-		log.Println("setting config inited")
 		return nil
 	} else {
 		return err

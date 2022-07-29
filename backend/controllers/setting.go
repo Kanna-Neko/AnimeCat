@@ -95,7 +95,7 @@ func PutSettingHandler(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  http.StatusInternalServerError,
-			"message": fmt.Sprintf("modify setting error: %s", err),
+			"message": fmt.Sprintf("modify setting error: %s", err.Error()),
 		})
 		log.Println(err)
 		return
