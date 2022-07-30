@@ -1,13 +1,14 @@
 package jwt
 
 import (
+	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
 )
 
 // 用于签名的字符串
-var mySigningKey = []byte("AnimeCatGo")
+var mySigningKey = []byte(os.Getenv("jwt_key"))
 
 // GenRegisteredClaims 使用默认声明创建jwt
 func GenRegisteredClaims() (string, error) {

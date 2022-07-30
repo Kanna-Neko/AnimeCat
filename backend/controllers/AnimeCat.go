@@ -44,5 +44,4 @@ func AnimeCatHandler(c *gin.Context) {
 			})
 		}
 	}
-
 }
