@@ -54,12 +54,48 @@ func GetAnimeCatDir(path []string) (AnimeCat, error) {
 		}
 	}
 	return cat, nil
-
+}
+func GetAnimeCatObj(path []string) (AnimeCat, error) {
+	var filter = bson.M{"_id": jaxleof}
+	var cat AnimeCat
+	err := client.Database("AnimeCat").Collection("AnimeCat").FindOne(context.TODO(), filter).Decode(&cat)
+	if err != nil {
+		return AnimeCat{}, nil
+	}
+	for i := 0; i < len(path)-1; i++ {
+		err := cat.switchDir(path[i])
+		if err != nil {
+			return AnimeCat{}, err
+		}
+	}
+	err = cat.switchObj(path[len(path)-1])
+	if err != nil {
+		return AnimeCat{}, err
+	}
+	return cat, err
 }
 
 func (cat *AnimeCat) switchDir(path string) error {
 	var found = false
 	for i := 0; i < len(cat.DirChild); i++ {
+		if cat.DirChild[i].Name == path {
+			found = true
+			var err error
+			*cat, err = GetAnimeCat(cat.DirChild[i].ID)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	if !found {
+		return errors.New("path can't been founded")
+	}
+	return nil
+}
+
+func (cat *AnimeCat) switchObj(path string) error {
+	var found = false
+	for i := 0; i < len(cat.ObjChild); i++ {
 		if cat.DirChild[i].Name == path {
 			found = true
 			var err error

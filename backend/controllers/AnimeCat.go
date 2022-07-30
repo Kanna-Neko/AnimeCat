@@ -27,6 +27,22 @@ func AnimeCatHandler(c *gin.Context) {
 				},
 			})
 		}
+	}else {
+		cat, err := mongodb.GetAnimeCatObj(paths)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status":  http.StatusBadRequest,
+				"message": err.Error(),
+			})
+		} else {
+			c.JSON(200, gin.H{
+				"status":  200,
+				"message": "success",
+				"data": gin.H{
+					"cat": cat,
+				},
+			})
+		}
 	}
 
 }
