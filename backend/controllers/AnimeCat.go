@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func AnimeCatHandler(c *gin.Context) {
@@ -27,7 +28,7 @@ func AnimeCatHandler(c *gin.Context) {
 				},
 			})
 		}
-	}else {
+	} else {
 		cat, err := mongodb.GetAnimeCatObj(paths)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -43,5 +44,63 @@ func AnimeCatHandler(c *gin.Context) {
 				},
 			})
 		}
+	}
+}
+
+func PostAnimeCatDir(c *gin.Context) {
+	var info gin.H
+	err := c.BindJSON(&info)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": err.Error(),
+		})
+		return
+	}
+	_, exist := info["_id"]
+	if !exist {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": "_id field is not founded",
+		})
+		return
+	}
+	_, exist = info["name"]
+	if !exist {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": "name field is not founded",
+		})
+		return
+	}
+	id, err := primitive.ObjectIDFromHex(info["_id"].(string))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": err.Error(),
+		})
+		return
+	}
+	cat, err := mongodb.GetAnimeCat(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": err.Error(),
+		})
+		return
+	}
+	err = cat.CreateDir(info["name"].(string))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": err.Error(),
+		})
+		return
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  200,
+			"message": "dir create process is success",
+			"data":    cat,
+		})
 	}
 }

@@ -32,6 +32,6 @@ type AnimeCat struct {
 }
 
 type Cat struct {
-	ID   primitive.ObjectID `json:"-" bson:"_id"`
+	ID   primitive.ObjectID `json:"_id" bson:"_id"`
 	Name string             `json:"name" bson:"name"`
 }

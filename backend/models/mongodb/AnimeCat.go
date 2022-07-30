@@ -111,6 +111,39 @@ func (cat *AnimeCat) switchObj(path string) error {
 	return nil
 }
 
+func (cat *AnimeCat) CreateDir(name string) error {
+	for i := 0; i < len(cat.DirChild); i++ {
+		if cat.DirChild[i].Name == name {
+			return errors.New("there is already the same dir here")
+		}
+	}
+	var newCat = AnimeCat{
+		ID:         primitive.NewObjectID(),
+		Name:       name,
+		UpdateTime: time.Now().UnixMilli(),
+		Size:       0,
+		IsDir:      true,
+		DirChild:   []Cat{},
+		ObjChild:   []Cat{},
+	}
+	err := CreateAnimeCat(newCat)
+	if err != nil {
+		return err
+	}
+	cat.DirChild = append(cat.DirChild, Cat{ID: newCat.ID, Name: name})
+	return cat.updateDatabase()
+}
+
+func (cat *AnimeCat) updateDatabase() error {
+	var filter = bson.M{"_id": cat.ID}
+	_, err := client.Database("AnimeCat").Collection("AnimeCat").UpdateOne(context.TODO(), filter, bson.M{"$set": *cat})
+	return err
+}
+func CreateAnimeCat(cat AnimeCat) error {
+	_, err := client.Database("AnimeCat").Collection("AnimeCat").InsertOne(context.TODO(), cat)
+	return err
+}
+
 func GetAnimeCat(id primitive.ObjectID) (AnimeCat, error) {
 	var res AnimeCat
 	var filter = bson.M{

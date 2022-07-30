@@ -18,6 +18,8 @@ func InitRouter() {
 		api.GET("/setting", controllers.GetSettingHandler)
 		api.PUT("/setting", controllers.PutSettingHandler)
 		api.GET("/AnimeCat/*path", controllers.AnimeCatHandler)
+		api.POST("/AnimeCat/dir", controllers.PostAnimeCatDir)
+		// api.POST("/AnimeCat/obj", controllers.PostAnimeCatObj)
 	}
 	err := r.Run(":80")
 	if err != nil {

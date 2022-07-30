@@ -37,6 +37,7 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 				"code":    http.StatusUnauthorized,
 				"message": "unauthorized",
 			})
+			c.Abort()
 			return
 		}
 		c.Next()
