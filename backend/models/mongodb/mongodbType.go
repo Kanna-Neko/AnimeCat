@@ -23,6 +23,7 @@ type Setting struct {
 
 type AnimeCat struct {
 	ID         primitive.ObjectID `json:"_id" bson:"_id"`
+	PID        primitive.ObjectID `json:"p_id" bson:"p_id"`
 	Name       string             `json:"name" bson:"name"`
 	UpdateTime int64              `json:"updateTime" bson:"updateTime"`
 	Size       int64              `json:"size" bson:"size"`
@@ -32,6 +33,8 @@ type AnimeCat struct {
 }
 
 type Cat struct {
-	ID   primitive.ObjectID `json:"_id" bson:"_id"`
-	Name string             `json:"name" bson:"name"`
+	ID         primitive.ObjectID `json:"_id" bson:"_id"`
+	Name       string             `json:"name" bson:"name"`
+	UpdateTime int64              `json:"updateTime" bson:"updateTime"`
+	Size       int64              `json:"size" bson:"size"`
 }

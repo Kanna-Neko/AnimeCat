@@ -15,6 +15,7 @@ var (
 	jaxleof         = primitive.ObjectID{'A', 'n', 'i', 'm', 'e', 'C', 'a', 't'}
 	defaultAnimeCat = AnimeCat{
 		ID:         jaxleof,
+		PID:        jaxleof,
 		Name:       "",
 		UpdateTime: time.Now().UnixMilli(),
 		Size:       0,
@@ -119,6 +120,7 @@ func (cat *AnimeCat) CreateDir(name string) error {
 	}
 	var newCat = AnimeCat{
 		ID:         primitive.NewObjectID(),
+		PID:        cat.ID,
 		Name:       name,
 		UpdateTime: time.Now().UnixMilli(),
 		Size:       0,
@@ -130,14 +132,28 @@ func (cat *AnimeCat) CreateDir(name string) error {
 	if err != nil {
 		return err
 	}
-	cat.DirChild = append(cat.DirChild, Cat{ID: newCat.ID, Name: name})
+	cat.DirChild = append(cat.DirChild, Cat{ID: newCat.ID, Name: name, UpdateTime: cat.UpdateTime})
 	return cat.updateDatabase()
 }
 
 func (cat *AnimeCat) updateDatabase() error {
 	var filter = bson.M{"_id": cat.ID}
+	cat.UpdateTime = time.Now().UnixMilli()
 	_, err := client.Database("AnimeCat").Collection("AnimeCat").UpdateOne(context.TODO(), filter, bson.M{"$set": *cat})
-	return err
+	if err != nil {
+		return err
+	}
+	if cat.PID != cat.ID {
+		p, err := GetAnimeCat(cat.PID)
+		if err != nil {
+			return err
+		}
+		err = p.updateDatabase()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 func CreateAnimeCat(cat AnimeCat) error {
 	_, err := client.Database("AnimeCat").Collection("AnimeCat").InsertOne(context.TODO(), cat)

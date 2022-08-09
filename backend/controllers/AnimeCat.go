@@ -104,3 +104,37 @@ func PostAnimeCatDir(c *gin.Context) {
 		})
 	}
 }
+
+func AnimeCatIDHandler(c *gin.Context) {
+	var info map[string]string
+	c.BindJSON(&info)
+	val, exist := info["_id"]
+	if !exist {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": "want _id field, but null",
+		})
+		return
+	}
+	id, err := primitive.ObjectIDFromHex(val)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
+			"message": "id format wrong, error: " + err.Error(),
+		})
+		return
+	}
+	cat, err := mongodb.GetAnimeCat(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "error: " + err.Error(),
+		})
+		return
+	}
+	c.JSON(200, gin.H{
+		"status":  200,
+		"message": "success",
+		"data":    cat,
+	})
+}
