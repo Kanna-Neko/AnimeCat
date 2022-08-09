@@ -112,6 +112,41 @@ func (cat *AnimeCat) switchObj(path string) error {
 	return nil
 }
 
+func (cat *AnimeCat) Delete() error {
+	if cat.ID == jaxleof {
+		return errors.New("you can't delete root directory")
+	}
+	for _, v := range cat.DirChild {
+		nex, err := GetAnimeCat(v.ID)
+		if err != nil {
+			return err
+		}
+		err = nex.Delete()
+		if err != nil {
+			return err
+		}
+	}
+	for _, v := range cat.ObjChild {
+		nex, err := GetAnimeCat(v.ID)
+		if err != nil {
+			return err
+		}
+		err = nex.Delete()
+		if err != nil {
+			return err
+		}
+	}
+	var filter = bson.M{"_id": cat.ID}
+	_, err := client.Database("AnimeCat").Collection("AnimeCat").DeleteOne(context.TODO(), filter)
+	if err != nil {
+		return err
+	}
+	// if !cat.IsDir {
+
+	// }
+	return nil
+}
+
 func (cat *AnimeCat) CreateDir(name string) error {
 	for i := 0; i < len(cat.DirChild); i++ {
 		if cat.DirChild[i].Name == name {
