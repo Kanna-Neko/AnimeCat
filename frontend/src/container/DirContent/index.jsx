@@ -5,17 +5,28 @@ import { debounce } from '../../utils/throttle.js'
 import './index.less'
 
 function DirContent(props) {
-  // console.log("DIRCONTENT GET: ", props);
-  const { dirList, fileList } = props
-  // console.log(dirList, fileList);
+  // console.log("DIRCONTENT GET: ", props.rootDir);
+  const { dirList, fileList, getData, rootDir } = props
 
   const [crtClick, setCrtClick] = useState()
   const [crtFocus, setCrtFocus] = useState()
   const [menuBoxLeft, setMenuBoxLeft] = useState()
   const [menuBoxTop, setMenuBoxTop] = useState()
   const [showMenuBox, setShowMenuBox] = useState(false)
+  const [histrorylist, setHistrorylist] = useState([])
+  const [rClick, setRClick] = useState('')
+
+  const menuList = [
+    { name: '打开', show: false, callback: () => { } },
+    { name: '复制', show: true, callback: () => { } },
+    { name: '粘贴', show: true, callback: () => { } },
+    { name: '重命名', show: true, callback: () => { } },
+    { name: '删除', show: true, callback: () => { } },
+    { name: '属性', show: true, callback: () => { } }
+  ]
 
   const contextMenuRef = useRef()
+  const dC_main_Ref = useRef()
 
   function getFileIcon(fileType = 'media') {
     switch (fileType) {
@@ -31,10 +42,11 @@ function DirContent(props) {
 
   }
 
-  function toTag() {
-
+  function backTo(index, id) {
+    if (index === histrorylist.length - 1) return
+    setHistrorylist([...histrorylist.splice(0, index + 1)])
+    getData(id)
   }
-
 
   useEffect(() => {
     // 去除选择文字
@@ -50,23 +62,63 @@ function DirContent(props) {
     })
 
 
+
     function menuBox(e) {
+
+      // 如果点击空白区域
+      let isEffect = e.target.getAttribute("id") === 'dC_main'
+      isEffect && setCrtClick('') // 取消已选
+
+      // 如果点击了右键菜单中
+      let isMenu = e.target.getAttribute("class") === 'menuItem'
+        || e.target.getAttribute("class") === 'menuItem_dark'
+        || e.target.getAttribute("id") === 'contextMenu'
+      if (isMenu) return
+
+      // 点击限制在 dC_main 中出现右键菜单
+      let menuBox = contextMenuRef.current
+      let dC_main = dC_main_Ref.current
+      let { left, right, top, bottom, width, height } = dC_main.getBoundingClientRect()
+      let isInDC_main = e.x >= left && e.x <= right && e.y >= top && e.y <= bottom
+      isInDC_main && e.preventDefault()
+      // 右键菜单内容更新
+
+      console.log(rClick);
+
+
+      // 右键菜单位移
+
       setShowMenuBox(false)
       setTimeout(() => {
-        let menuBox = contextMenuRef.current
-        let parentLeft = menuBox.offsetParent.offsetLeft
-        let parentTop = menuBox.offsetParent.offsetTop
-        setMenuBoxLeft(e.x - parentLeft)
-        setMenuBoxTop(e.y - parentTop)
-        setTimeout(() => {
-          setShowMenuBox(true)
-        }, 140)
+        if (isInDC_main) {
+          let boxLeft = e.x - left
+          let boxTop = e.y - top + 40 // 40 为导航栏的高度
+          let boundWidth = width - menuBox.offsetWidth
+          let boundHeight = height - menuBox.offsetHeight + 40
+          if (boxLeft >= boundWidth) boxLeft = boundWidth - 20
+          if (boxTop >= boundHeight) boxTop = boundHeight - 20
+
+          console.log(e.y, top);
+          setMenuBoxLeft(boxLeft)
+          setMenuBoxTop(boxTop)
+
+          setTimeout(() => {
+            setShowMenuBox(true)
+          }, 180)
+        }
       }, 100)
     }
 
     // 修改右键模式
-    document.addEventListener('contextmenu', debounce(menuBox, 500, false))
-  }, [])
+    document.addEventListener('contextmenu', debounce(menuBox, 500, true))
+
+  }, [contextMenuRef])
+
+  useEffect(() => {
+
+    if (rootDir) setHistrorylist([rootDir])
+    // setHistrorylist([rootDir])
+  }, [rootDir])
 
   function toggle_DC_click(id) {
     setCrtClick(id)
@@ -76,32 +128,39 @@ function DirContent(props) {
     setCrtFocus(id)
   }
 
-  const menuList = ['重命名', '打开', '删除', '复制', '粘贴', '属性']
+  function IntoDir(index, id) {
+    histrorylist.push(dirList[index])
+    getData(id)
+  }
 
 
-  const list = ['11', '23', '234']
 
   return (
     <div id="dirContent">
       <div id="dC_nav">{
-        list.map((i, index) => {
+        histrorylist.map((i, index) => {
           return (
-            <Fragment>
-              <span className='dc_nav_tap' onClick={toTag} title={'backTo: ' + i}>{i}</span>
-              {index === list.length - 1 ? <span></span> : <span>&gt;</span>}
+            <Fragment key={i._id}>
+              <span className='dc_nav_tap' onClick={() => backTo(index, i?._id)} title={'backTo: ' + i?.name}>{i?.name}</span>
+              {index === histrorylist.length - 1 ? <span></span> : <span>&gt;</span>}
             </Fragment>
           )
         })
       }</div>
-      <div id="dC_main">
+      <div id="dC_main" className="animate__fadeIn animate__animated" ref={dC_main_Ref}>
         {
           dirList?.map((i, index) => {
-            return (<div className={`dC_dir ${crtFocus === i._id && 'dC_focus'} ${crtClick === i._id && 'dC_click'} `}
-              key={i._id + index}
+            return (<div className={`dC_dir
+            ${crtFocus === i._id && 'dC_focus'} ${crtClick === i._id && 'dC_click'} `}
+              key={i._id}
               onClick={() => toggle_DC_click(i._id)}
-              onContextMenu={() => toggle_DC_click(i._id)}
+              onContextMenu={() => {
+                setRClick('dir')
+                toggle_DC_click(i._id)
+              }}
               onMouseEnter={() => toggle_DC_focus(i._id)}
               onMouseLeave={() => toggle_DC_focus('')}
+              onDoubleClick={() => IntoDir(index, i._id)}
             >
               <div className="dirIcon">
                 <svg t="1661406678205" className="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1737" width="16" height="16"><path d="M439.9 359.2l-99.7-156.3h-81.4c-66.5 0-120.5 53.9-120.5 120.5v294.9h751.4V359.2H439.9z" fill="#2867CE" p-id="1738"></path><path d="M769.3 871.6H258.7c-92.9 0-168.5-75.6-168.5-168.5V323.3c0-92.9 75.6-168.5 168.5-168.5h81.4c16.4 0 31.7 8.4 40.5 22.2l85.5 134.1h423.5c26.6 0 48.1 21.5 48.1 48.1v343.9c0.1 92.9-75.5 168.5-168.4 168.5zM258.7 250.9c-39.9 0-72.4 32.5-72.4 72.4v379.8c0 39.9 32.5 72.4 72.4 72.4h510.5c39.9 0 72.4-32.5 72.4-72.4V407.3H439.9c-16.4 0-31.7-8.4-40.5-22.2L313.9 251h-55.2z" fill="#BDD2EF" p-id="1739"></path><path d="M840.2 272.7h-314l-69.6-109.2h383.6z" fill="#2867CE" p-id="1740"></path></svg>
@@ -111,17 +170,21 @@ function DirContent(props) {
           })
         }
         {
-          fileList?.map((i, index) => {
-            return (<div className={`dC_file ${crtClick === /*i._id*/index && 'dC_click'} ${crtFocus === index && 'dC_focus'}`}
-              key={index}
-              onClick={() => toggle_DC_click(/*i._id*/index)}
-              onContextMenu={() => toggle_DC_click(index)}
-              onMouseEnter={() => toggle_DC_focus(index)}
+          fileList?.map(i => {
+            return (<div className={`dC_file
+            ${crtClick === i._id && 'dC_click'} ${crtFocus === i._id && 'dC_focus'}`}
+              key={i._id}
+              onClick={() => toggle_DC_click(i._id)}
+              onContextMenu={() => {
+                setRClick('file')
+                toggle_DC_click(i._id)
+              }}
+              onMouseEnter={() => toggle_DC_focus(i._id)}
               onMouseLeave={() => toggle_DC_focus('')}>
               <div className="fileIcon">
                 {getFileIcon()}
               </div>
-              <span className='fileName'>{i}</span>
+              <span className='fileName'>{i.name}</span>
             </div>)
           })
         }
@@ -129,13 +192,14 @@ function DirContent(props) {
       <div id="contextMenu" ref={contextMenuRef}
         style={{
           transform: `translate(${menuBoxLeft}px,${menuBoxTop}px)`,
-          opacity: showMenuBox ? 1 : 0
+          opacity: showMenuBox ? 1 : 0,
+          zIndex: showMenuBox ? 100 : -100
         }}>
         {menuList.map((i, index) => {
           return (
-            <span className='menuItem'
+            <span className={i.show ? 'menuItem' : 'menuItem_dark'}
               key={index}
-            >{i}</span>
+            >{i.name}</span>
           )
         })}
       </div>

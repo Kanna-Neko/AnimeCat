@@ -19,28 +19,38 @@ function Home(props) {
   const Item_focus = index => setItemIndex(index)
 
   const getDir = async () => {
-    let response = await request({ url: '/AnimeCat/1' })
-    return response.data
+    let response = await request({ url: `/AnimeCat/` })
+    // return response.data
+    console.log(response);
+    console.log("Dir", response.data.cat);
+    setModules(response.data.cat.dirChild)
+
+    getData()
   }
 
-  const getFile = async () => {
-    let response = await request({ url: '/AnimeCatID?apifoxResponseId=80889644' })
-    return response.data
-  }
 
-  useEffect(() => {
-    let result = getDir()
-    result.then(val => {
-      console.log("Dir", val.cat);
-      setModules(val.cat.dirChild)
-    })
+  const getData = (id) => {
+
+    const getFile = async () => {
+      let response = await request({ url: `/AnimeCatID?id=${id}` })
+      return response.data
+    }
 
     let files = getFile()
     files.then(val => {
-      console.log("File", val)
+      // console.log("File", val)
       props.change({ dirList: val.dirChild, fileList: val.objChild })
     })
+  }
 
+  const changeDirContent = (index, id) => {
+    Item_focus(index)
+    getData(id)
+  }
+
+
+  useEffect(() => {
+    getDir()
   }, [])
 
   return (
@@ -56,12 +66,15 @@ function Home(props) {
             </div>
           </div>
         </div>
-        <nav>
+        <nav >
           {modules.map((i, index) => {
             return (
-              <div className={itemIndex === index ? "navItem navItem_focus" : "navItem"}
-                onClick={() => Item_focus(index)}
-                key={i._id + index}>
+              <div className={`animate__fadeInLeft animate__animated 
+              ${itemIndex === index ? "navItem navItem_focus" : "navItem"}`}
+                onClick={() => {
+                  changeDirContent(index, i._id)
+                }}
+                key={i._id}>
                 <span>{i.name}</span>
               </div>
             )
@@ -84,7 +97,7 @@ function Home(props) {
           </div>
         </div>
         <div className="main_center">
-          <DirContent />
+          <DirContent getData={getData} rootDir={modules[itemIndex]} />
         </div>
         <div className="main_bottom" style={{
           height: bottomIsOpen ? '80px' : '0px'
@@ -117,3 +130,6 @@ export default connect(
   state => ({ dirContent: state.dirContent }),
   { change }
 )(Home)
+
+
+

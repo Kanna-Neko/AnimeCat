@@ -1,6 +1,7 @@
 #dirContent {
   height: 100%;
   overflow: hidden;
+  position: relative;
 }
 
 #dC_nav {
@@ -38,6 +39,9 @@
   flex-wrap: wrap;
   overflow-x: hidden;
   overflow-y: auto;
+  position: relative;
+
+
 }
 
 .dC_dir,
@@ -128,7 +132,8 @@
 
   }
 
-  .menuItem {
+  .menuItem,
+  .menuItem_dark {
     text-indent: 10px;
     width: 100%;
     min-width: 200px;
@@ -137,10 +142,31 @@
     border-bottom: 1px solid rgba(204, 204, 204, 0.1);
     cursor: pointer;
     transition: all .2s;
+  }
 
+  .menuItem {
     &:hover {
       border-radius: 8px;
       background-color: rgba(255, 255, 255, 0.1);
     }
   }
+
+  .menuItem_dark {
+    color: #888;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  // background: #222;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 12px;
+  background: #333;
+}
+
+::-webkit-scrollbar-track {
+  border-radius: 12px;
+  background: rgba(255, 245, 245, 0);
 }
